@@ -1,0 +1,13 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['pull', 'malikakb/demo-project:$TAG_NAME']
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        if [[ "$TAG_NAME" == *"malik"* ]]; then
+          gsutil cp gs://demo-react-bucket/malik/dev/index.html /workspace/index.html
+        elif [[ "$TAG_NAME" == *"nawas"* ]]; then
+          gsutil cp gs://nawas-dev/index.html /workspace/index.html
+        fi
