@@ -19,43 +19,38 @@ steps:
           gsutil cp gs://nawas-dev/index.html /workspace/index.html
         fi
 
-  # Step 4: Send a Telegram notification
-  # - name: 'gcr.io/cloud-builders/curl'
-  #   args:
-  #     - '-X'
-  #     - 'POST'
-  #     - 'https://api.telegram.org/bot7335978148:AAE82z_6CcesA3S8-yGl_XSNic-g3IkMkgs/sendMessage'
-  #     - '-d'
-  #     - 'chat_id=-4663907958'
-  #     - '-d'
-  #     - 'text=Build triggered for $TAG_NAME'
+  Step 4: Send a Telegram notification
+  - name: 'gcr.io/cloud-builders/curl'
+    args:
+      - '-X'
+      - 'POST'
+      - 'https://api.telegram.org/bot7335978148:AAE82z_6CcesA3S8-yGl_XSNic-g3IkMkgs/sendMessage'
+      - '-d'
+      - 'chat_id=-4663907958'
+      - '-d'
+      - 'text=Build triggered for $TAG_NAME'
 
     steps:  
       - name: 'gcr.io/cloud-builders/gcloud'
         args: ['app', 'deploy']
     options:
-        logging: NONE
+        logging: CLOUD_LOGGING_ONLY
         substitution_option: ALLOW_LOOSE  # Allow optional environment variables
         machine_type: E2_SMALL  # (Optional) Cheaper machine if your build is lightweight
-  
 
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['pull', 'malikakb/demo-project:$TAG_NAME']
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        if [[ "$TAG_NAME" == *"malik"* ]]; then
+          gsutil cp gs://demo-react-bucket/malik/dev/index.html /workspace/index.html
+        elif [[ "$TAG_NAME" == *"nawas"* ]]; then
+          gsutil cp gs://nawas-dev/index.html /workspace/index.html
+        fi
+     
 substitutions:
   _TAG_NAME: latest
-
-
-
-
-
-# steps:
-#   - name: 'gcr.io/cloud-builders/docker'
-#     args: ['pull', 'malikakb/demo-project:$TAG_NAME']
-#   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-#     entrypoint: 'bash'
-#     args:
-#       - '-c'
-#       - |
-#         if [[ "$TAG_NAME" == *"malik"* ]]; then
-#           gsutil cp gs://demo-react-bucket/malik/dev/index.html /workspace/index.html
-#         elif [[ "$TAG_NAME" == *"nawas"* ]]; then
-#           gsutil cp gs://nawas-dev/index.html /workspace/index.html
-#         fi
