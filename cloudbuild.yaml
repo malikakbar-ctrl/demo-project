@@ -20,21 +20,23 @@ steps:
         fi
 
   # Step 4: Send a Telegram notification
-  - name: 'gcr.io/cloud-builders/curl'
-    args:
-      - '-X'
-      - 'POST'
-      - 'https://api.telegram.org/bot7335978148:AAE82z_6CcesA3S8-yGl_XSNic-g3IkMkgs/sendMessage'
-      - '-d'
-      - 'chat_id=-4663907958'
-      - '-d'
-      - 'text=Build triggered for $TAG_NAME'
+  # - name: 'gcr.io/cloud-builders/curl'
+  #   args:
+  #     - '-X'
+  #     - 'POST'
+  #     - 'https://api.telegram.org/bot7335978148:AAE82z_6CcesA3S8-yGl_XSNic-g3IkMkgs/sendMessage'
+  #     - '-d'
+  #     - 'chat_id=-4663907958'
+  #     - '-d'
+  #     - 'text=Build triggered for $TAG_NAME'
 
     steps:  
       - name: 'gcr.io/cloud-builders/gcloud'
         args: ['app', 'deploy']
     options:
         logging: NONE
+        substitution_option: ALLOW_LOOSE  # Allow optional environment variables
+        machine_type: E2_SMALL  # (Optional) Cheaper machine if your build is lightweight
   
 
 substitutions:
