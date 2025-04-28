@@ -1,4 +1,43 @@
 steps:
+  # Step 1: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'malikakb/demo-project:$TAG_NAME', '.']
+
+  # Step 2: Push the Docker image to Docker Hub
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'malikakb/demo-project:$TAG_NAME']
+
+  # Step 3: Copy the correct index.html file from GCS based on the tag
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        if [[ "$TAG_NAME" == *"malik"* ]]; then
+          gsutil cp gs://demo-react-bucket/malik/dev/index.html /workspace/index.html
+        elif [[ "$TAG_NAME" == *"nawas"* ]]; then
+          gsutil cp gs://nawas-dev/index.html /workspace/index.html
+        fi
+
+  # Step 4: Send a Telegram notification
+  - name: 'gcr.io/cloud-builders/curl'
+    args:
+      - '-X'
+      - 'POST'
+      - 'https://api.telegram.org/bot7335978148:AAE82z_6CcesA3S8-yGl_XSNic-g3IkMkgs/sendMessage'
+      - '-d'
+      - 'chat_id=-4663907958'
+      - '-d'
+      - 'text=Build triggered for $TAG_NAME'
+
+substitutions:
+  _TAG_NAME: latest
+
+
+
+
+
+steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['pull', 'malikakb/demo-project:$TAG_NAME']
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
