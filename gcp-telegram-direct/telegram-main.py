@@ -4,8 +4,8 @@ import requests
 import functions_framework
 
 # Telegram details
-TELEGRAM_BOT_TOKEN = "123456789:AAH...xyz"  # Apna token daal do
-TELEGRAM_CHAT_ID = "-987654321"              # Apna chat ID daal do
+TELEGRAM_BOT_TOKEN = "7335978148:AAE82z_6CcesA3S8-yGl_XSNic-g3IkMkgs"  # Apna token daal do
+TELEGRAM_CHAT_ID = "-4663907958"              # Apna chat ID daal do
 
 @functions_framework.cloud_event
 def telegram_alert(cloud_event):
@@ -18,8 +18,8 @@ def telegram_alert(cloud_event):
     
     message = f"{repo_name} ka trigger '{trigger_name}' hua hai\nAur {status.lower()} hua hai"
     
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    params = {'chat_id': TELEGRAM_CHAT_ID, 'text': message}
+    url = f"https://api.telegram.org/bot7335978148:AAE82z_6CcesA3S8-yGl_XSNic-g3IkMkgs/sendMessage"
+    params = {'chat_id': -4663907958, 'text': message}
     response = requests.post(url, params=params)
     if response.status_code != 200:
         print(f"Error: {response.status_code} {response.text}")
