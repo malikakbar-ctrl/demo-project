@@ -24,9 +24,9 @@ steps:
       - '-X'
       - POST
       - >-
-        https://api.telegram.org/bot7335978148:AAE82z_6CcesA3S8-yGl_XSNic-g3IkMkgs/sendMessage
+        https://api.telegram.org/bot{token}/sendMessage
       - '-d'
-      - chat_id=-4663907958
+      - chat_id=:{id}
       - '-d'
       - 'text=Build triggered for ${TAG_NAME}'
     id: Send Telegram Notification
