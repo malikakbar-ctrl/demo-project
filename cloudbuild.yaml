@@ -1,4 +1,5 @@
 steps:
+  
   - name: gcr.io/cloud-builders/docker
     args:
       - build
@@ -9,10 +10,18 @@ steps:
     args:
       - push
       - 'gcr.io/$PROJECT_ID/demo-project:$TAG_NAME'
+
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      - '-c'
+      - ls -l /workspace
+    entrypoint: bash
+ 
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     args:
       - '-c'
       - |
+
         if [[ "$TAG_NAME" == *"malik"* ]]; then
           gsutil cp gs://malik-dev/index.html /workspace/index.html
         elif [[ "$TAG_NAME" == *"nawas"* ]]; then
@@ -33,8 +42,43 @@ steps:
 options:
   substitutionOption: ALLOW_LOOSE
   logging: NONE
+
+    if [[ "$TAG_NAME" =~ ^malik-(dev|prod)-v[0-9]+$ ]]; then
+          echo "Matched malik environment tag: $TAG_NAME"
+          gsutil cp gs://demo-react-bucket/malik/${BASH_REMATCH[1]}/index.html /workspace/index.html
+        elif [[ "$TAG_NAME" =~ ^nawas-(dev|prod)-v[0-9]+$ ]]; then
+          echo "Matched nawas environment tag: $TAG_NAME"
+          gsutil cp gs://demo-react-bucket/nawas/${BASH_REMATCH[1]}/index.html /workspace/index.html
+        else
+          echo "No valid tag matched. Attempting to use default file."
+          if gsutil -q stat gs://demo-react-bucket/default/index.html; then
+            gsutil cp gs://demo-react-bucket/default/index.html /workspace/index.html
+          else
+            echo "Default file not found. Exiting gracefully."
+            exit 0
+          fi
+        fi
+    entrypoint: bash
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      - '-c'
+      - ls -l /workspace
+    entrypoint: bash
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/demo-project:$TAG_NAME'
+      - .
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - 'gcr.io/$PROJECT_ID/demo-project:$TAG_NAME'
+options:
+  substitutionOption: ALLOW_LOOSE
+  logging: CLOUD_LOGGING_ONLY
 substitutions:
-  _TAG_NAME: latest
+  TAG_NAME: latest
 
 
 
@@ -103,3 +147,5 @@ substitutions:
      
 # substitutions:
 #   _TAG_NAME: latest
+=======
+>>>>>>> 825b802 (update cloudbuild.yaml)
